@@ -1,0 +1,175 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Demo Simple Hashing</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"><style>:root{--bg:#F2F4F3;--surface:#FFFFFF;--ink:#15202B;--muted:#55626E;--line:#D3DADD;--accent:#0B6E6E;--accent-ink:#FFFFFF;--accent-soft:#D9ECEB;--warn:#B4540A;--warn-soft:#F8E6D6;--code-bg:#E8EDED;
+--f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1618;--surface:#162023;--ink:#E6ECEC;--muted:#93A3A6;--line:#2A3A3D;--accent:#4FC3C0;--accent-ink:#0F1618;--accent-soft:#17302F;--warn:#F0A060;--warn-soft:#3A2A1B;--code-bg:#0B1113;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1618;--surface:#162023;--ink:#E6ECEC;--muted:#93A3A6;--line:#2A3A3D;--accent:#4FC3C0;--accent-ink:#0F1618;--accent-soft:#17302F;--warn:#F0A060;--warn-soft:#3A2A1B;--code-bg:#0B1113;color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--f-body);padding-block:0 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:960px;margin:0 auto}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+button{font-family:inherit}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:18px;border-bottom:1px solid var(--line);font:500 13px var(--f-mono)}
+.top a{text-decoration:none}
+.top span{color:var(--muted)}
+h1{font:700 clamp(2rem,5.5vw,3.2rem)/1.05 var(--f-display);letter-spacing:-.02em;margin:36px 0 10px;text-wrap:balance}
+.lead{margin:0 0 20px;color:var(--muted);max-width:62ch;font-size:1.05rem}
+.note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 6px 6px 0;font-size:14px;margin:0 0 28px;max-width:78ch}
+.note b{font-weight:500}
+.btn{font:500 14px var(--f-body);cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 16px;border-radius:6px}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+input[type=text],input[type=email],input[type=password],input[type=number]{font:400 15px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 12px;width:100%}
+label{font:500 13px var(--f-mono);color:var(--muted);display:block;margin-bottom:4px}
+.mono{font-family:var(--f-mono)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.inputs{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;margin-bottom:12px}
+.step{border-top:1px solid var(--line);padding-block:22px}
+.step h2{font:700 1.25rem/1.2 var(--f-display);margin:0 0 6px;display:flex;gap:10px;align-items:center}
+.step p{margin:0 0 12px;color:var(--muted);max-width:66ch}
+.n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:500 13px var(--f-mono)}
+.chars{display:flex;flex-wrap:wrap;gap:6px}
+.ch{display:grid;text-align:center;min-width:40px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px}
+.ch b{font:500 17px var(--f-mono);font-weight:500}
+.ch i{font:400 12px var(--f-mono);font-style:normal;color:var(--accent)}
+.box{font:400 14px/1.5 var(--f-mono);background:var(--code-bg);padding:12px 14px;border-radius:6px;overflow-wrap:anywhere;max-height:150px;overflow:auto}
+.box.big{font-size:1.4rem}
+.hex .cut{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.hex .keep{color:var(--accent);font-weight:500}
+.result{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.label{font:500 13px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.final{font:500 clamp(1.3rem,4vw,2rem) var(--f-mono);background:var(--accent-soft);padding:8px 14px;border-radius:6px;overflow-wrap:anywhere}
+.small{font-size:14px;margin-top:14px!important}
+code{font-family:var(--f-mono);font-size:.9em}
+@media(max-width:640px){.inputs{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<div class="top"><a href="index.html">← Portfólio</a><span>Simple Hashing · demonstração</span></div>
+<h1>Simple Hashing</h1>
+<p class="lead">Digite um nome. O programa transforma o texto em um código curto, passo a passo. O mesmo nome sempre dá o mesmo código.</p>
+<p class="note"><b>Versão para navegador.</b> O programa original é um notebook em Python. Esta página refaz a mesma conta e dá o mesmo resultado que o script, inclusive o sorteio com semente fixa.</p>
+
+<div class="inputs">
+  <div><label for="name">Nome</label><input type="text" id="name" value="Thaís Martin Baramarchi" autocomplete="off" maxlength="60"></div>
+  <div class="seedbox"><label for="seed">Semente do sorteio</label><input type="number" id="seed" value="2" min="0" max="4294967295"></div>
+</div>
+
+<section class="step"><h2><span class="n">1</span> Cada letra vira um número</h2>
+<p>Cada caractere tem um número no padrão Unicode (<code>ord</code> em Python).</p>
+<div id="chars" class="chars" aria-live="polite"></div></section>
+
+<section class="step"><h2><span class="n">2</span> Multiplica todos os números</h2>
+<p>O resultado é enorme: <b id="digits">0</b> dígitos.</p>
+<div id="prod" class="box"></div></section>
+
+<section class="step"><h2><span class="n">3</span> Sorteia um número com semente fixa</h2>
+<p>Com a mesma semente, o "sorteio" repete sempre o mesmo valor. Aqui sai um inteiro entre o tamanho do nome e 2.000.000.</p>
+<div id="rnd" class="box big"></div></section>
+
+<section class="step"><h2><span class="n">4</span> Mistura os dois com XOR e mostra em hexadecimal</h2>
+<p>O programa mostra só os primeiros 16 caracteres. A parte em cinza é cortada.</p>
+<div id="hex" class="box hex"></div>
+<div class="result"><span class="label">Resultado</span><span id="final" class="final"></span></div>
+<p class="small">Repare que o sorteio só altera os últimos dígitos, que ficam na parte cortada. Por isso é um exercício para aprender, não um hash seguro como os usados em senhas.</p>
+</section>
+</div>
+<script>var LANG=(function(){try{var l=localStorage.getItem("pf.lang");if(l==="en"||l==="pt")return l}catch(e){}return location.hash==="#en"?"en":"pt"})();
+var NF=LANG==="en"?"en-US":"pt-BR";
+var D={
+"← Portfólio":"← Portfolio",
+"Simple Hashing · demonstração":"Simple Hashing · demo","Shipping Company · demonstração":"Shipping Company · demo","Dentist Appointment Calendar · demonstração":"Dentist Appointment Calendar · demo","SkyCast · demonstração":"SkyCast · demo",
+"Versão para navegador.":"Browser version.",
+/* hash */
+"Digite um nome. O programa transforma o texto em um código curto, passo a passo. O mesmo nome sempre dá o mesmo código.":"Type a name. The program turns the text into a short code, step by step. The same name always gives the same code.",
+"O programa original é um notebook em Python. Esta página refaz a mesma conta e dá o mesmo resultado que o script, inclusive o sorteio com semente fixa.":"The original program is a Python notebook. This page does the same math and gives the same result as the script, including the fixed-seed random draw.",
+"Nome":"Name","Semente do sorteio":"Random seed",
+"Cada letra vira um número":"Each letter becomes a number",
+"Cada caractere tem um número no padrão Unicode (":"Every character has a number in the Unicode standard (","em Python).":"in Python).",
+"Multiplica todos os números":"Multiply all the numbers","O resultado é enorme:":"The result is huge:","dígitos.":"digits.",
+"Sorteia um número com semente fixa":"Draw a number with a fixed seed",
+"Com a mesma semente, o \"sorteio\" repete sempre o mesmo valor. Aqui sai um inteiro entre o tamanho do nome e 2.000.000.":"With the same seed, the \"draw\" always repeats the same value. Here it is an integer between the name length and 2,000,000.",
+"Mistura os dois com XOR e mostra em hexadecimal":"Mix both with XOR and show it in hexadecimal",
+"O programa mostra só os primeiros 16 caracteres. A parte em cinza é cortada.":"The program shows only the first 16 characters. The grey part is cut off.",
+"Resultado":"Result",
+"Repare que o sorteio só altera os últimos dígitos, que ficam na parte cortada. Por isso é um exercício para aprender, não um hash seguro como os usados em senhas.":"Notice that the random draw only changes the last digits, which fall in the cut-off part. So this is a learning exercise, not a secure hash like the ones used for passwords.",
+"Digite um nome acima.":"Type a name above.",
+/* frete */
+"Escolha quantos produtos serão enviados. O programa calcula o espaço e o peso do pedido e diz quantos contêineres são necessários e quanto custa. As imagens são as do projeto.":"Choose how many products will be shipped. The program works out the order's volume and weight and tells you how many containers are needed and what it costs. The images are the project's own.",
+"O programa original é um aplicativo de computador em Java (JavaFX). Esta página usa as mesmas medidas, pesos e preços do código, com uma regra de escolha de contêineres simplificada para mostrar a ideia.":"The original program is a desktop app in Java (JavaFX). This page uses the same sizes, weights and prices as the code, with a simplified container-selection rule to show the idea.",
+"Exemplos":"Examples","Pedido pequeno":"Small order","Pedido de loja":"Store order","Limpar":"Clear",
+"Os contêineres":"The containers","Grande":"Big","Pequeno":"Small",
+"2,59 × 2,43 × 12,01 m":"2.59 × 2.43 × 12.01 m","2,59 × 2,43 × 6,06 m":"2.59 × 2.43 × 6.06 m",
+"Sem limite de peso":"No weight limit","Até 500 kg":"Up to 500 kg","1000$ (pedido abaixo de 500 kg) ou 1200$":"1000$ (order under 500 kg) or 1200$",
+"cada":"each","Itens:":"Items:","Volume total:":"Total volume:","Peso total:":"Total weight:","Escolha pelo menos um produto.":"Choose at least one product.",
+/* dentista */
+"Um computador de mentira com o programa aberto. Entre como paciente, secretária ou dentista e veja que cada um tem acesso diferente. O paciente marca, a secretária organiza a agenda e o dentista confirma ou cancela e avisa o paciente.":"A pretend computer with the program open. Sign in as a patient, secretary or dentist and see that each has different access. The patient books, the secretary organizes the schedule, and the dentist confirms or cancels and notifies the patient.",
+"O programa original é um aplicativo de computador em Java (Swing). Aqui as janelas, textos, permissões e mensagens seguem o código. Os dados ficam salvos só neste navegador, como o programa original grava em arquivos. As consultas agora são guardadas por data (no código original não diferenciavam os dias).":"The original program is a desktop app in Java (Swing). Here the windows, texts, permissions and messages follow the code. Data is saved only in this browser, just as the original program writes it to files. Appointments are now stored by date (in the original code they did not tell days apart).",
+"Nenhum usuário conectado":"No user signed in","Reabrir programa":"Reopen program","Contas de teste":"Test accounts",
+"Estas contas existem no código. Clique para copiar nos campos do Login.":"These accounts exist in the code. Click to fill in the Login fields.",
+"Arquivos salvos":"Saved files","Quem pode o quê":"Who can do what","See appointments":"See appointments",
+"own":"own","all":"all","self":"self","any patient":"any patient","any":"any","Register patients":"Register patients","Create any account type":"Create any account type",
+"O programa original guarda dados em arquivos de texto. Aqui você vê o equivalente, atualizando ao vivo.":"The original program stores data in text files. Here you see the equivalent, updating live.",
+"Apagar dados salvos":"Clear saved data","Programa encerrado":"Program closed","O programa foi encerrado.":"The program was closed.","Abrir de novo":"Open again","(vazio)":"(empty)",
+"Ou clique em":"Or click","na janela para criar uma conta de cliente.":"in the window to create a client account.",
+/* skycast */
+"App de previsão do tempo. Toque numa cidade para ver o clima, arraste para o lado para ver as outras e abra os detalhes com hora a hora, nascer e pôr do sol.":"A weather forecast app. Tap a city to see the weather, swipe sideways to see the others and open the details with hourly forecast, sunrise and sunset.",
+"O app original é feito em Flutter (para celular) e busca o clima de verdade na API OpenWeather. Aqui os números são de exemplo. O logo e a animação de carregamento são os arquivos do projeto. Os textos do app estão em inglês, como no original.":"The original app is built with Flutter (for phones) and fetches real weather from the OpenWeather API. The numbers here are samples. The logo and the loading animation are the project's own files. The app's texts are in English, as in the original.",
+"O que testar":"What to try","Pesquise uma cidade (ex.:":"Search for a city (e.g.",") e toque nela para ver a prévia e adicionar.":") and tap it to see the preview and add it.",
+"Arraste um cartão para a esquerda para apagar (ou use a tecla Delete com o cartão selecionado).":"Drag a card to the left to delete it (or press Delete with the card selected).",
+"No menu":"In the","…":"…",", troque °C/°F e abra":"menu, switch °C/°F and open","para vento e pressão. A escolha fica salva neste navegador.":"for wind and pressure. Your choice is saved in this browser.",
+"Simular sem internet":"Simulate no internet","Voltar a ficar online":"Go back online","Simular localização desligada":"Simulate location off","Ligar a localização":"Turn location on","Reabrir o app":"Reopen the app"
+};
+function T(s){return LANG==="en"&&D[s]!==undefined?D[s]:s}
+(function(){
+ if(LANG==="en"){document.documentElement.lang="en";
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,list=[];while(n=w.nextNode())list.push(n);
+  list.forEach(function(n){var t=n.nodeValue.trim();if(t&&D[t]!==undefined&&n.parentNode.tagName!=="SCRIPT"&&n.parentNode.tagName!=="STYLE")n.nodeValue=n.nodeValue.replace(t,D[t])});}
+ var top=document.querySelector(".top");if(top){var b=document.createElement("button");b.type="button";b.textContent=LANG==="en"?"PT":"EN";b.setAttribute("aria-label",LANG==="en"?"Português":"English");
+  b.style.cssText="font:500 12px var(--f-mono);background:none;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:3px 9px;cursor:pointer;margin-left:10px";
+  b.addEventListener("click",function(){try{localStorage.setItem("pf.lang",LANG==="en"?"pt":"en")}catch(e){}location.reload()});
+  var sp=top.querySelector("span");(sp||top).appendChild(b)}
+})();
+function pyRandint(seed,a,b){
+  var N=624,mt=new Array(N),i,j,k;
+  function initGen(s){mt[0]=s>>>0;for(var m=1;m<N;m++){var x=mt[m-1]^(mt[m-1]>>>30);mt[m]=(Math.imul(1812433253,x)+m)>>>0;}}
+  initGen(19650218);i=1;j=0;var key=[seed>>>0],kl=1;
+  for(k=N;k>0;k--){var x=mt[i-1]^(mt[i-1]>>>30);mt[i]=((mt[i]^Math.imul(x,1664525))+key[j]+j)>>>0;i++;j++;if(i>=N){mt[0]=mt[N-1];i=1;}if(j>=kl)j=0;}
+  for(k=N-1;k>0;k--){var y=mt[i-1]^(mt[i-1]>>>30);mt[i]=((mt[i]^Math.imul(y,1566083941))-i)>>>0;i++;if(i>=N){mt[0]=mt[N-1];i=1;}}
+  mt[0]=0x80000000;
+  var idx=N;
+  function next(){
+    if(idx>=N){var kk,y2;for(kk=0;kk<N;kk++){y2=(mt[kk]&0x80000000)|(mt[(kk+1)%N]&0x7fffffff);mt[kk]=mt[(kk+397)%N]^(y2>>>1)^((y2&1)?0x9908b0df:0);mt[kk]>>>=0;}idx=0;}
+    var z=mt[idx++];z^=z>>>11;z^=(z<<7)&0x9d2c5680;z^=(z<<15)&0xefc60000;z^=z>>>18;return z>>>0;}
+  var n=b-a+1,bits=32-Math.clz32(n),r=next()>>>(32-bits);
+  while(r>=n)r=next()>>>(32-bits);
+  return a+r;
+}
+function pyHash(name,seed){
+  var cps=Array.from(name).map(function(c){return c.codePointAt(0)});
+  var prod=1n;cps.forEach(function(c){prod*=BigInt(c)});
+  var p=pyRandint(seed,cps.length,2000000);
+  var x=prod^BigInt(p);
+  return {cps:cps,prod:prod,p:p,hex:"0x"+x.toString(16)};
+}
+
+
+var $=function(i){return document.getElementById(i)};
+function esc(s){return s.replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function run(){
+  var name=$("name").value, seed=parseInt($("seed").value,10);
+  if(isNaN(seed)||seed<0||seed>4294967295) seed=2;
+  if(!name){$("chars").innerHTML='<span class="small">'+T("Digite um nome acima.")+'</span>';["prod","rnd","hex"].forEach(function(i){$(i).textContent="";});$("final").textContent="";$("digits").textContent="0";return;}
+  var r=pyHash(name,seed);
+  $("chars").innerHTML=r.cps.map(function(c,i){var ch=String.fromCodePoint(c);return '<div class="ch"><b>'+(ch===" "?"␣":esc(ch))+'</b><i>'+c+'</i></div>'}).join("");
+  var ps=r.prod.toString();
+  $("digits").textContent=ps.length;
+  $("prod").textContent=ps;
+  $("rnd").textContent=r.p.toLocaleString(NF);
+  var hex=r.hex, keep=hex.slice(0,16), cut=hex.slice(16);
+  $("hex").innerHTML='<span class="keep">'+keep+'</span><span class="cut">'+cut+'</span>';
+  $("final").textContent=keep;
+}
+$("name").addEventListener("input",run);$("seed").addEventListener("input",run);run();
+</script></body></html>

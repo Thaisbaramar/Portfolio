@@ -1,0 +1,9 @@
+PORTFOLIO - Thais Martin Baramarchi
+
+COMO ABRIR
+1. Extraia (descompacte) este arquivo zip. Clique com o botao direito no zip e escolha "Extrair tudo".
+2. Abra a pasta e de dois cliques no arquivo "index.html". O site abre no seu navegador (Chrome, Edge, Safari, Firefox).
+3. Clique em "Ver demonstracao" em cada projeto para testar. Nao precisa instalar nada.
+
+Importante: mantenha todos os arquivos juntos na mesma pasta.
+No celular, e mais facil abrir pelo link do site, que a Thais envia junto.
